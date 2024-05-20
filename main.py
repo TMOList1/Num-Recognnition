@@ -4,6 +4,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 import numpy as np
 import matplotlib.pyplot as plt
 import keras
+import random
 from keras.src.layers import Dense, Flatten
 #from tensorflow.python.keras.layers import Dense, Flatten
 from keras.src.datasets import mnist
@@ -51,16 +52,20 @@ if __name__ == "__main__":
 							 loss='categorical_crossentropy',
 							 metrics=['accuracy'])
 	
-	model.fit(x_train, y_train_cat, batch_size=32, epochs=5, validation_split=0.2)
+	model.fit(x_train, 
+					 y_train_cat, 
+					 batch_size=32, 
+					 epochs=5, 
+					 validation_split=0.2)
 	
 	model.evaluate(x_test, y_test_cat)
 
-	n = 1
+	n = random.randint(0, 10_000)
 	x = np.expand_dims(x_test[n], axis=0)
 	res = model.predict(x)
-	print( res )
-	print( f"Распознанная цифра: {np.argmax(res)}" )
-
+	print( f'Веса выходного слоя: \n {res}', end='\n\n')
+	print( f'Выходной вектор: {y_train_cat[n]}')
+	print( f"\n Распознанная цифра: {np.argmax(res)}" )
 	plt.imshow(x_test[n], cmap=plt.cm.binary)
 	plt.show()
 
@@ -68,21 +73,16 @@ if __name__ == "__main__":
 	pred = model.predict(x_test)
 	pred = np.argmax(pred, axis=1)
 
-	print(pred.shape)
-
-	print(pred[:20])
-	print(y_test[:20])
-
-	#* Выделение неверных вариантов 
+	# * Выделение неверных вариантов 
 	mask = pred == y_test
-	print(mask[:10])
-
+	#print(mask[:10])
 	x_false = x_test[~mask]
-	y_false = y_test[~mask]
+	y_false = pred[~mask]
 
-	print(x_false.shape)
+	print( f'Количетво неверных выводов: {len(x_false)}')
+	print( f'Неверные результаты: \n{y_false[:25]}')
 	output_pics(x_false)
-
+	
 	# plt.figure(figsize=(10, 5))
 	# for i in range(25):
 	# 	plt.subplot(5, 5, i+1)
